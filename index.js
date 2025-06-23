@@ -41,9 +41,10 @@ app.get('/lyrics', async (req, res) => {
     const response = await fetch(apiUrl);
 
     if (!response.ok) {
-      console.error(`Erro da API lyrics.ovh: ${response.status}`);
-      return res.status(404).json({ error: 'Letra não encontrada.' });
-    }
+  const texto = await response.text(); // tenta ler a resposta mesmo se erro
+  console.error(`Erro da API lyrics.ovh: ${response.status} - ${texto}`);
+  return res.status(404).json({ error: 'Letra não encontrada ou API falhou.' });
+}
 
     const data = await response.json();
 
