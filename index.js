@@ -22,15 +22,22 @@ app.get('/deezer/search/artist', async (req, res) => {
 // Proxy para top músicas do artista no Deezer
 app.get('/deezer/artist/:id/top', async (req, res) => {
   const { id } = req.params;
+
   try {
-    const response = await fetch(`https://api.deezer.com/artist/${id}/top?limit=10&output=json`);
-    const data = await response.json();
-    res.json(data);
+    const response = await axios.get(`https://api.deezer.com/artist/${id}/top?limit=10`);
+
+    if (response.status === 200 && response.data) {
+      res.json(response.data);
+    } else {
+      console.error('Resposta inesperada da Deezer:', response.status, response.data);
+      res.status(502).json({ error: 'Erro ao buscar top músicas no Deezer' });
+    }
   } catch (error) {
-    console.error('Erro no proxy de top músicas:', error);
-    res.status(500).json({ error: 'Erro ao buscar top músicas' });
+    console.error('Erro no proxy de top músicas:', error.message);
+    res.status(500).json({ error: 'Erro interno ao buscar top músicas' });
   }
 });
+
 
 // Proxy para buscar letras da API lyrics.ovh
 app.get('/lyrics', async (req, res) => {
