@@ -39,13 +39,25 @@ app.get('/lyrics', async (req, res) => {
 
   try {
     const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      console.error(`Erro da API lyrics.ovh: ${response.status}`);
+      return res.status(404).json({ error: 'Letra não encontrada.' });
+    }
+
     const data = await response.json();
-    res.json(data);
+
+    if (data.lyrics) {
+      res.json(data);
+    } else {
+      res.status(404).json({ error: 'Letra não encontrada.' });
+    }
   } catch (error) {
     console.error('Erro ao buscar letra:', error);
-    res.status(500).json({ error: 'Erro ao buscar letra' });
+    res.status(500).json({ error: 'Erro interno ao buscar letra.' });
   }
 });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Proxy rodando na porta ${PORT}`));
